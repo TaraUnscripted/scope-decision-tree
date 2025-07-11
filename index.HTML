@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bug Classification Decision Tree</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f7fa;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+        }
+        .decision-tree {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        .decision-node {
+            background: #f8f9fa;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .decision-node:hover {
+            border-color: #3498db;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
+        }
+        .question {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        .options {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .option {
+            flex: 1;
+            min-width: 250px;
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .option.yes {
+            border-left: 4px solid #27ae60;
+        }
+        .option.no {
+            border-left: 4px solid #e74c3c;
+        }
+        .option.maybe {
+            border-left: 4px solid #f39c12;
+        }
+        .option-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        .option-description {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        .result {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+        .result.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .result-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .result-action {
+            font-size: 18px;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            display: inline-block;
+        }
+        .result.bug {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+        .result.sub-bug {
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+        }
+        .result.missed-criteria {
+            background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
+        }
+        .result.new-scope {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+        .legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        .reset-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            transition: background 0.3s ease;
+        }
+        .reset-button:hover {
+            background: #2980b9;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bug Classification & Sprint Decision Tree</h1>
+        <p class="subtitle">Follow the questions to properly classify issues and decide on sprint inclusion</p>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #e74c3c;"></div>
+                <span>Bug</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #e67e22;"></div>
+                <span>Sub-bug</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #f39c12;"></div>
+                <span>Missed Criteria</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #3498db;"></div>
+                <span>New Scope</span>
+            </div>
+        </div>
+
+        <div class="decision-tree" id="decisionTree">
+            <!-- Question 1 -->
+            <div class="decision-node" id="q1">
+                <div class="question">1. Is this issue preventing core functionality from working?</div>
+                <div class="options">
+                    <div class="option yes" onclick="answer('q1', 'yes')">
+                        <div class="option-title">Yes</div>
+                        <div class="option-description">Users cannot complete primary tasks, system crashes, data loss, security vulnerability</div>
+                    </div>
+                    <div class="option no" onclick="answer('q1', 'no')">
+                        <div class="option-title">No</div>
+                        <div class="option-description">System works but with issues, workarounds exist, non-critical problems</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="decision-node hidden" id="q2">
+                <div class="question">2. Was this functionality explicitly defined in the acceptance criteria?</div>
+                <div class="options">
+                    <div class="option yes" onclick="answer('q2', 'yes')">
+                        <div class="option-title">Yes</div>
+                        <div class="option-description">Clearly documented in user story, requirements, or specifications</div>
+                    </div>
+                    <div class="option no" onclick="answer('q2', 'no')">
+                        <div class="option-title">No</div>
+                        <div class="option-description">Not mentioned in any requirements or acceptance criteria</div>
+                    </div>
+                    <div class="option maybe" onclick="answer('q2', 'implied')">
+                        <div class="option-title">Implied/Unclear</div>
+                        <div class="option-description">Could be interpreted from requirements but not explicit</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="decision-node hidden" id="q3">
+                <div class="question">3. Is this related to an existing bug or recently completed work?</div>
+                <div class="options">
+                    <div class="option yes" onclick="answer('q3', 'yes')">
+                        <div class="option-title">Yes</div>
+                        <div class="option-description">Directly caused by or related to a known bug or recent changes</div>
+                    </div>
+                    <div class="option no" onclick="answer('q3', 'no')">
+                        <div class="option-title">No</div>
+                        <div class="option-description">Independent issue, not related to current work</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="decision-node hidden" id="q4">
+                <div class="question">4. What is the impact on users or business?</div>
+                <div class="options">
+                    <div class="option yes" onclick="answer('q4', 'high')">
+                        <div class="option-title">High Impact</div>
+                        <div class="option-description">Affects many users, revenue impact, compliance issues, brand damage</div>
+                    </div>
+                    <div class="option maybe" onclick="answer('q4', 'medium')">
+                        <div class="option-title">Medium Impact</div>
+                        <div class="option-description">Affects some users, workaround exists but inconvenient</div>
+                    </div>
+                    <div class="option no" onclick="answer('q4', 'low')">
+                        <div class="option-title">Low Impact</div>
+                        <div class="option-description">Minor inconvenience, cosmetic issues, edge cases</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div class="result hidden" id="result"></div>
+        </div>
+
+        <button class="reset-button hidden" id="resetButton" onclick="reset()">Start Over</button>
+    </div>
+
+    <script>
+        let answers = {};
+
+        function answer(questionId, value) {
+            answers[questionId] = value;
+            
+            // Hide current question
+            document.getElementById(questionId).style.display = 'none';
+            
+            // Determine next step
+            if (questionId === 'q1') {
+                if (value === 'yes') {
+                    showResult('bug', 'This is a BUG', 'Add to current sprint immediately');
+                } else {
+                    showQuestion('q2');
+                }
+            } else if (questionId === 'q2') {
+                if (value === 'yes') {
+                    showQuestion('q3');
+                } else if (value === 'no') {
+                    showQuestion('q4');
+                } else {
+                    showResult('missed-criteria', 'This is MISSED CRITERIA', 'Review with PO, consider for current sprint');
+                }
+            } else if (questionId === 'q3') {
+                if (value === 'yes') {
+                    showResult('sub-bug', 'This is a SUB-BUG', 'Link to parent bug, include in sprint');
+                } else {
+                    showResult('bug', 'This is a BUG', 'Prioritize based on severity for sprint');
+                }
+            } else if (questionId === 'q4') {
+                if (value === 'high') {
+                    showResult('new-scope', 'This is NEW SCOPE (High Priority)', 'Create new story, consider for next sprint');
+                } else if (value === 'medium') {
+                    showResult('new-scope', 'This is NEW SCOPE (Medium Priority)', 'Add to backlog for grooming');
+                } else {
+                    showResult('new-scope', 'This is NEW SCOPE (Low Priority)', 'Add to backlog for future consideration');
+                }
+            }
+        }
+
+        function showQuestion(questionId) {
+            document.getElementById(questionId).classList.remove('hidden');
+        }
+
+        function showResult(type, title, action) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result ${type} show`;
+            resultDiv.innerHTML = `
+                <div class="result-title">${title}</div>
+                <div class="result-action">📋 ${action}</div>
+            `;
+            document.getElementById('resetButton').classList.remove('hidden');
+        }
+
+        function reset() {
+            answers = {};
+            document.querySelectorAll('.decision-node').forEach(node => {
+                node.style.display = 'block';
+                node.classList.add('hidden');
+            });
+            document.getElementById('q1').classList.remove('hidden');
+            document.getElementById('result').classList.add('hidden');
+            document.getElementById('resetButton').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
