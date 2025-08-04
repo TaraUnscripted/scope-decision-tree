@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bug Classification Decision Tree</title>
+    <title>Bug Classification Decision Tree - NEO Process</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -28,7 +28,18 @@
         .subtitle {
             text-align: center;
             color: #7f8c8d;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        .key-principle {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: 600;
+            color: #1976d2;
         }
         .decision-tree {
             display: flex;
@@ -52,6 +63,12 @@
             font-weight: 600;
             color: #2c3e50;
             margin-bottom: 15px;
+        }
+        .question-detail {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            font-style: italic;
         }
         .options {
             display: flex;
@@ -127,17 +144,26 @@
             border-radius: 5px;
             display: inline-block;
         }
+        .result-note {
+            font-size: 14px;
+            margin-top: 15px;
+            opacity: 0.9;
+            font-style: italic;
+        }
         .result.bug {
             background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
         }
         .result.sub-bug {
             background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
         }
-        .result.missed-criteria {
-            background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
+        .result.sub-task {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
         }
-        .result.new-scope {
+        .result.new-story {
             background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+        .result.convert {
+            background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
         }
         .legend {
             display: flex;
@@ -178,97 +204,116 @@
         .hidden {
             display: none;
         }
+        .examples {
+            background: #f8f9fa;
+            border: 1px solid #e1e8ed;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .examples strong {
+            color: #2c3e50;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Bug Classification & Sprint Decision Tree</h1>
-        <p class="subtitle">Follow the questions to properly classify issues and decide on sprint inclusion</p>
+        <h1>NEO Bug Classification Decision Tree</h1>
+        <p class="subtitle">Based on Rebecca's guidance - Follow the questions to properly classify issues</p>
+        
+        <div class="key-principle">
+            📌 Key Principle: "Sub-bugs should only be opened for things that are preventing a story from passing QA/PO Review"
+        </div>
         
         <div class="legend">
             <div class="legend-item">
                 <div class="legend-color" style="background: #e74c3c;"></div>
-                <span>Bug</span>
+                <span>Bug (Standalone)</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color" style="background: #e67e22;"></div>
                 <span>Sub-bug</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: #f39c12;"></div>
-                <span>Missed Criteria</span>
+                <div class="legend-color" style="background: #9b59b6;"></div>
+                <span>Sub-task</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color" style="background: #3498db;"></div>
-                <span>New Scope</span>
+                <span>New Story</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #f39c12;"></div>
+                <span>Convert Issues</span>
             </div>
         </div>
 
         <div class="decision-tree" id="decisionTree">
             <!-- Question 1 -->
             <div class="decision-node" id="q1">
-                <div class="question">1. Is this issue preventing core functionality from working?</div>
+                <div class="question">1. Is something actually broken/malfunctioning?</div>
+                <div class="question-detail">Not missing features or new requirements - is existing functionality failing?</div>
                 <div class="options">
                     <div class="option yes" onclick="answer('q1', 'yes')">
-                        <div class="option-title">Yes</div>
-                        <div class="option-description">Users cannot complete primary tasks, system crashes, data loss, security vulnerability</div>
+                        <div class="option-title">Yes - It's Broken</div>
+                        <div class="option-description">Built functionality not working as documented, errors, crashes, incorrect behavior</div>
                     </div>
                     <div class="option no" onclick="answer('q1', 'no')">
-                        <div class="option-title">No</div>
-                        <div class="option-description">System works but with issues, workarounds exist, non-critical problems</div>
+                        <div class="option-title">No - It's Missing/New</div>
+                        <div class="option-description">Feature not built yet, new requirement discovered, scope change</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Question 2 -->
+            <!-- Question 2 - For broken functionality -->
             <div class="decision-node hidden" id="q2">
-                <div class="question">2. Was this functionality explicitly defined in the acceptance criteria?</div>
+                <div class="question">2. What is the current status of the parent story?</div>
+                <div class="question-detail">Check where the story currently sits in the workflow</div>
                 <div class="options">
-                    <div class="option yes" onclick="answer('q2', 'yes')">
-                        <div class="option-title">Yes</div>
-                        <div class="option-description">Clearly documented in user story, requirements, or specifications</div>
+                    <div class="option yes" onclick="answer('q2', 'active')">
+                        <div class="option-title">In Active Sprint</div>
+                        <div class="option-description">Story is in development, verification, or PO review this sprint</div>
                     </div>
-                    <div class="option no" onclick="answer('q2', 'no')">
-                        <div class="option-title">No</div>
-                        <div class="option-description">Not mentioned in any requirements or acceptance criteria</div>
+                    <div class="option no" onclick="answer('q2', 'complete')">
+                        <div class="option-title">Already Complete</div>
+                        <div class="option-description">Story passed QA & PO review, or found in production</div>
                     </div>
-                    <div class="option maybe" onclick="answer('q2', 'implied')">
-                        <div class="option-title">Implied/Unclear</div>
-                        <div class="option-description">Could be interpreted from requirements but not explicit</div>
+                    <div class="option maybe" onclick="answer('q2', 'backlog')">
+                        <div class="option-title">In/Moved to Backlog</div>
+                        <div class="option-description">Story was descoped or moved back to backlog</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Question 3 -->
+            <!-- Question 3 - For missing/new functionality -->
             <div class="decision-node hidden" id="q3">
-                <div class="question">3. Is this related to an existing bug or recently completed work?</div>
+                <div class="question">3. What type of missing/new work is this?</div>
+                <div class="question-detail">Determine the appropriate classification for non-bug work</div>
                 <div class="options">
-                    <div class="option yes" onclick="answer('q3', 'yes')">
-                        <div class="option-title">Yes</div>
-                        <div class="option-description">Directly caused by or related to a known bug or recent changes</div>
+                    <div class="option yes" onclick="answer('q3', 'missed-ac')">
+                        <div class="option-title">Missed AC (No Defect)</div>
+                        <div class="option-description">QA found missing acceptance criteria, but what was built works correctly</div>
                     </div>
-                    <div class="option no" onclick="answer('q3', 'no')">
-                        <div class="option-title">No</div>
-                        <div class="option-description">Independent issue, not related to current work</div>
+                    <div class="option no" onclick="answer('q3', 'new-scope')">
+                        <div class="option-title">New/Descoped Work</div>
+                        <div class="option-description">New requirements, descoped features, or "realized we need Y"</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Question 4 -->
+            <!-- Question 4 - For active sprint stories -->
             <div class="decision-node hidden" id="q4">
-                <div class="question">4. What is the impact on users or business?</div>
+                <div class="question">4. Is this preventing the story from passing QA/PO review?</div>
+                <div class="question-detail">The critical question for sub-bug classification</div>
                 <div class="options">
-                    <div class="option yes" onclick="answer('q4', 'high')">
-                        <div class="option-title">High Impact</div>
-                        <div class="option-description">Affects many users, revenue impact, compliance issues, brand damage</div>
+                    <div class="option yes" onclick="answer('q4', 'yes')">
+                        <div class="option-title">Yes - Blocking</div>
+                        <div class="option-description">Story cannot be marked complete until this is fixed</div>
                     </div>
-                    <div class="option maybe" onclick="answer('q4', 'medium')">
-                        <div class="option-title">Medium Impact</div>
-                        <div class="option-description">Affects some users, workaround exists but inconvenient</div>
-                    </div>
-                    <div class="option no" onclick="answer('q4', 'low')">
-                        <div class="option-title">Low Impact</div>
-                        <div class="option-description">Minor inconvenience, cosmetic issues, edge cases</div>
+                    <div class="option no" onclick="answer('q4', 'no')">
+                        <div class="option-title">No - Not Blocking</div>
+                        <div class="option-description">Minor issue that doesn't prevent story completion</div>
                     </div>
                 </div>
             </div>
@@ -292,31 +337,50 @@
             // Determine next step
             if (questionId === 'q1') {
                 if (value === 'yes') {
-                    showResult('bug', 'This is a BUG', 'Add to current sprint immediately');
-                } else {
+                    // It's broken - check story status
                     showQuestion('q2');
+                } else {
+                    // It's missing/new - determine type
+                    showQuestion('q3');
                 }
             } else if (questionId === 'q2') {
-                if (value === 'yes') {
-                    showQuestion('q3');
-                } else if (value === 'no') {
+                if (value === 'active') {
+                    // Story in active sprint - check if blocking
                     showQuestion('q4');
+                } else if (value === 'complete') {
+                    // Story complete - standalone bug
+                    showResult('bug', 'This is a BUG (Standalone)', 
+                        '📋 Create as Bug issue type<br>📎 Link to original story<br>🎯 Prioritize based on severity',
+                        'Story already passed QA/PO review - cannot create sub-bugs on completed work');
                 } else {
-                    showResult('missed-criteria', 'This is MISSED CRITERIA', 'Review with PO, consider for current sprint');
+                    // Story in backlog
+                    showResult('convert', 'Convert Sub-bugs to Bugs', 
+                        '🔄 Convert any existing sub-bugs to standalone Bugs<br>📎 Update links (remove parent-child)<br>🎯 Schedule independently',
+                        'Story no longer in active development - sub-bugs must be converted');
                 }
             } else if (questionId === 'q3') {
-                if (value === 'yes') {
-                    showResult('sub-bug', 'This is a SUB-BUG', 'Link to parent bug, include in sprint');
+                if (value === 'missed-ac') {
+                    // Missed AC without defect
+                    showResult('sub-task', 'This is a SUB-TASK', 
+                        '✅ Create as Sub-task (not sub-bug)<br>📝 "Dev missed AC item X"<br>🔧 Complete before story closes',
+                        'Everything built works correctly - this is just incomplete work, not a defect');
                 } else {
-                    showResult('bug', 'This is a BUG', 'Prioritize based on severity for sprint');
+                    // New scope
+                    showResult('new-story', 'This is a NEW STORY', 
+                        '📄 Create new Story in backlog<br>✍️ Write clear acceptance criteria<br>🎯 Prioritize appropriately',
+                        'New requirements or descoped work should never be bugs');
                 }
             } else if (questionId === 'q4') {
-                if (value === 'high') {
-                    showResult('new-scope', 'This is NEW SCOPE (High Priority)', 'Create new story, consider for next sprint');
-                } else if (value === 'medium') {
-                    showResult('new-scope', 'This is NEW SCOPE (Medium Priority)', 'Add to backlog for grooming');
+                if (value === 'yes') {
+                    // Blocking story completion
+                    showResult('sub-bug', 'This is a SUB-BUG', 
+                        '🐛 Create as Sub-bug under the story<br>🚫 Story cannot pass until fixed<br>⚡ Work in current sprint',
+                        'Issue is preventing story from passing QA/PO review');
                 } else {
-                    showResult('new-scope', 'This is NEW SCOPE (Low Priority)', 'Add to backlog for future consideration');
+                    // Not blocking
+                    showResult('bug', 'This is a BUG (Standalone)', 
+                        '📋 Create as Bug issue type<br>📎 Link to story<br>🎯 Can be deferred if needed',
+                        'Minor issue not preventing story completion - use standalone bug for flexibility');
                 }
             }
         }
@@ -325,14 +389,62 @@
             document.getElementById(questionId).classList.remove('hidden');
         }
 
-        function showResult(type, title, action) {
+        function showResult(type, title, action, note) {
             const resultDiv = document.getElementById('result');
             resultDiv.className = `result ${type} show`;
             resultDiv.innerHTML = `
                 <div class="result-title">${title}</div>
-                <div class="result-action">📋 ${action}</div>
+                <div class="result-action">${action}</div>
+                ${note ? `<div class="result-note">${note}</div>` : ''}
+                ${getExamples(type)}
             `;
             document.getElementById('resetButton').classList.remove('hidden');
+        }
+
+        function getExamples(type) {
+            const examples = {
+                'bug': `
+                    <div class="examples">
+                        <strong>Examples:</strong><br>
+                        • Customer reported issue in production<br>
+                        • Regression found during testing<br>
+                        • Issue found after story was closed last sprint
+                    </div>
+                `,
+                'sub-bug': `
+                    <div class="examples">
+                        <strong>Examples:</strong><br>
+                        • QA finds button doesn't work as specified<br>
+                        • PO review shows data displaying incorrectly<br>
+                        • Acceptance criteria met but functionality broken
+                    </div>
+                `,
+                'sub-task': `
+                    <div class="examples">
+                        <strong>Examples:</strong><br>
+                        • "You built A and B correctly, but forgot C from the AC"<br>
+                        • Missing validation that was in requirements<br>
+                        • Incomplete implementation (no defects in what was built)
+                    </div>
+                `,
+                'new-story': `
+                    <div class="examples">
+                        <strong>Examples:</strong><br>
+                        • "While testing X, we realized we need Y"<br>
+                        • Features that were descoped from original story<br>
+                        • PO wants additional functionality after seeing demo
+                    </div>
+                `,
+                'convert': `
+                    <div class="examples">
+                        <strong>Examples:</strong><br>
+                        • Sprint ended, story moved to next sprint<br>
+                        • Story descoped mid-sprint due to priority change<br>
+                        • Story blocked and moved back to backlog
+                    </div>
+                `
+            };
+            return examples[type] || '';
         }
 
         function reset() {
