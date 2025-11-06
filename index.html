@@ -349,17 +349,18 @@
                         '📋 Create as Bug issue type<br>📎 Link to original story<br>🎯 Prioritize based on severity',
                         'Story already passed QA/PO review - cannot create sub-bugs on completed work');
                 } else {
-                // Story in backlog
-                showResult('convert', 'Convert Sub-bugs to Bugs', 
-                    '🔄 Convert any existing sub-bugs to standalone Bugs<br>📎 Update links (remove parent-child)<br>🎯 Schedule independently<br><br>⚠️ CRITICAL: If you need to pull a sub-bug into a sprint WITHOUT its parent story, you MUST convert it to a Bug first. Jira will force you to pull the entire parent story if it remains a sub-bug.',
-                    'Story no longer in active development - sub-bugs must be converted to allow flexible scheduling');
-                } else if (questionId === 'q3') {
-                    if (value === 'missed-ac') {
-                        // Missed AC - treat as sub-bug
-                        showResult('sub-bug', 'This is a SUB-BUG', 
-                            '🐛 Create as Sub-bug under the story<br>📝 "Missed AC: [description]"<br>🚫 Story cannot pass until complete',
-                            'Missed acceptance criteria must be completed as sub-bugs per leadership guidance');
-                    } else {
+                    // Story in backlog
+                    showResult('convert', 'Convert Sub-bugs to Bugs', 
+                        '🔄 Convert any existing sub-bugs to standalone Bugs<br>📎 Update links (remove parent-child)<br>🎯 Schedule independently<br><br>⚠️ CRITICAL: If you need to pull a sub-bug into a sprint WITHOUT its parent story, you MUST convert it to a Bug first. Jira will force you to pull the entire parent story if it remains a sub-bug.',
+                        'Story no longer in active development - sub-bugs must be converted to allow flexible scheduling');
+                }
+            } else if (questionId === 'q3') {
+                if (value === 'missed-ac') {
+                    // Missed AC - treat as sub-bug
+                    showResult('sub-bug', 'This is a SUB-BUG', 
+                        '🐛 Create as Sub-bug under the story<br>📝 "Missed AC: [description]"<br>🚫 Story cannot pass until complete',
+                        'Missed acceptance criteria must be completed as sub-bugs per leadership guidance');
+                } else {
                     // New scope
                     showResult('new-story', 'This is a NEW STORY', 
                         '📄 Create new Story in backlog<br>✍️ Write clear acceptance criteria<br>🎯 Prioritize appropriately',
@@ -413,14 +414,6 @@
                         • PO review shows data displaying incorrectly<br>
                         • Developer missed implementing AC item from story<br>
                         • Any acceptance criteria not completed from original story
-                    </div>
-                `,
-                'sub-task': `
-                    <div class="examples">
-                        <strong>Examples:</strong><br>
-                        • "You built A and B correctly, but forgot C from the AC"<br>
-                        • Missing validation that was in requirements<br>
-                        • Incomplete implementation (no defects in what was built)
                     </div>
                 `,
                 'new-story': `
