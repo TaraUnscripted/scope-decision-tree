@@ -292,15 +292,15 @@
 
             <!-- Question 3 - For missing/new functionality -->
             <div class="decision-node hidden" id="q3">
-                <div class="question">3. What type of missing/new work is this?</div>
-                <div class="question-detail">Determine the appropriate classification for non-bug work</div>
+                <div class="question">3. Is this missed acceptance criteria from the story?</div>
+                <div class="question-detail">Was this requirement already defined in the story's acceptance criteria?</div>
                 <div class="options">
                     <div class="option yes" onclick="answer('q3', 'missed-ac')">
-                        <div class="option-title">Missed AC (No Defect)</div>
-                        <div class="option-description">QA found missing acceptance criteria, but what was built works correctly</div>
+                        <div class="option-title">Yes - Missed AC</div>
+                        <div class="option-description">QA/Dev found missing acceptance criteria that was in the story requirements</div>
                     </div>
                     <div class="option no" onclick="answer('q3', 'new-scope')">
-                        <div class="option-title">New/Descoped Work</div>
+                        <div class="option-title">No - New Requirements</div>
                         <div class="option-description">New requirements, descoped features, or "realized we need Y"</div>
                     </div>
                 </div>
