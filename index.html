@@ -349,11 +349,10 @@
                         '📋 Create as Bug issue type<br>📎 Link to original story<br>🎯 Prioritize based on severity',
                         'Story already passed QA/PO review - cannot create sub-bugs on completed work');
                 } else {
-                    // Story in backlog
-                    showResult('convert', 'Convert Sub-bugs to Bugs', 
-                        '🔄 Convert any existing sub-bugs to standalone Bugs<br>📎 Update links (remove parent-child)<br>🎯 Schedule independently',
-                        'Story no longer in active development - sub-bugs must be converted');
-                }
+                // Story in backlog
+                showResult('convert', 'Convert Sub-bugs to Bugs', 
+                    '🔄 Convert any existing sub-bugs to standalone Bugs<br>📎 Update links (remove parent-child)<br>🎯 Schedule independently<br><br>⚠️ CRITICAL: If you need to pull a sub-bug into a sprint WITHOUT its parent story, you MUST convert it to a Bug first. Jira will force you to pull the entire parent story if it remains a sub-bug.',
+                    'Story no longer in active development - sub-bugs must be converted to allow flexible scheduling');
                 } else if (questionId === 'q3') {
                     if (value === 'missed-ac') {
                         // Missed AC - treat as sub-bug
@@ -437,7 +436,8 @@
                         <strong>Examples:</strong><br>
                         • Sprint ended, story moved to next sprint<br>
                         • Story descoped mid-sprint due to priority change<br>
-                        • Story blocked and moved back to backlog
+                        • Story blocked and moved back to backlog<br>
+                        • <strong>Team has capacity to work on sub-bug but not full parent story</strong>
                     </div>
                 `
             };
