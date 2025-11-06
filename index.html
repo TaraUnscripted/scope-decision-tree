@@ -156,9 +156,6 @@
         .result.sub-bug {
             background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
         }
-        .result.sub-task {
-            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-        }
         .result.new-story {
             background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
         }
@@ -240,10 +237,6 @@
                 <span>Sub-bug</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: #9b59b6;"></div>
-                <span>Sub-task</span>
-            </div>
-            <div class="legend-item">
                 <div class="legend-color" style="background: #3498db;"></div>
                 <span>New Story</span>
             </div>
@@ -252,11 +245,10 @@
                 <span>Convert Issues</span>
             </div>
         </div>
-
         <div class="decision-tree" id="decisionTree">
             <!-- Question 1 -->
             <div class="decision-node" id="q1">
-                <div class="question">1. Is something actually broken/malfunctioning?</div>
+                <div class="question">Is something actually broken/malfunctioning?</div>
                 <div class="question-detail">Not missing features or new requirements - is existing functionality failing?</div>
                 <div class="options">
                     <div class="option yes" onclick="answer('q1', 'yes')">
@@ -272,7 +264,7 @@
 
             <!-- Question 2 - For broken functionality -->
             <div class="decision-node hidden" id="q2">
-                <div class="question">2. What is the current status of the parent story?</div>
+                <div class="question">What is the current status of the parent story?</div>
                 <div class="question-detail">Check where the story currently sits in the workflow</div>
                 <div class="options">
                     <div class="option yes" onclick="answer('q2', 'active')">
@@ -292,7 +284,7 @@
 
             <!-- Question 3 - For missing/new functionality -->
             <div class="decision-node hidden" id="q3">
-                <div class="question">3. Is this missed acceptance criteria from the story?</div>
+                <div class="question">Is this missed acceptance criteria from the story?</div>
                 <div class="question-detail">Was this requirement already defined in the story's acceptance criteria?</div>
                 <div class="options">
                     <div class="option yes" onclick="answer('q3', 'missed-ac')">
@@ -308,7 +300,7 @@
 
             <!-- Question 4 - For active sprint stories -->
             <div class="decision-node hidden" id="q4">
-                <div class="question">4. Is this preventing the story from passing QA/PO review?</div>
+                <div class="question">Is this preventing the story from passing QA/PO review?</div>
                 <div class="question-detail">The critical question for sub-bug classification</div>
                 <div class="options">
                     <div class="option yes" onclick="answer('q4', 'yes')">
